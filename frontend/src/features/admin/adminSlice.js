@@ -1,112 +1,106 @@
-import {createSlice,createAsyncThunk} from '@reduxjs/toolkit'
-import adminService from './adminService'
-                                                           
-const initialState={
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import adminService from "./adminService";
+
+const initialState = {
   users: [],
   isError: false,
   isSuccess: false,
   isLoading: false,
   message: "",
-}
+};
 
-//Get users 
-export const getUser=createAsyncThunk(
-    'users/getAll', async(_,thunkAPI)=>{
-        try {
-            const token=thunkAPI.getState().auth.user.token
-            return await adminService.getUser(token)
-        } catch (error) {
-            const message =
-            (error.response &&
-              error.response.data &&
-              error.response.data.message) ||
-            error.message ||
-            error.toString()
-          return thunkAPI.rejectWithValue(message) 
-        }
-    }
-)
-
+//Get users
+export const getUser = createAsyncThunk("users/getAll", async (_, thunkAPI) => {
+  try {
+    const token = thunkAPI.getState().auth.user.token;
+    return await adminService.getUser(token);
+  } catch (error) {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+    return thunkAPI.rejectWithValue(message);
+  }
+});
 
 //Get one user
-export const getOneUser=createAsyncThunk(
-    'users/getOne',async(id,thunkAPI)=>{
-        try {
-            const token = thunkAPI.getState().auth.user.token
-            return await adminService.getOneUser(id,token)
-        } catch (error) {
-            const message =
-            (error.response &&
-              error.response.data &&
-              error.response.data.message) ||
-            error.message ||
-            error.toString()
-          return thunkAPI.rejectWithValue(message)
-        }
-    }
-    )
-
-//Delete user 
-export const deleteUser=createAsyncThunk(
-'users/delete',async(id,thunkAPI)=>{
+export const getOneUser = createAsyncThunk(
+  "users/getOne",
+  async (id, thunkAPI) => {
     try {
-        
-        const token = thunkAPI.getState().auth.user.token
-         return await adminService.deleteUser(id,token)
-         
-        //  getUser();
-
+      const token = thunkAPI.getState().auth.user.token;
+      return await adminService.getOneUser(id, token);
     } catch (error) {
-        const message =
+      const message =
         (error.response &&
           error.response.data &&
           error.response.data.message) ||
         error.message ||
-        error.toString()
-      return thunkAPI.rejectWithValue(message)
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
     }
-}
-)
+  }
+);
 
+//Delete user
+export const deleteUser = createAsyncThunk(
+  "users/delete",
+  async (id, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await adminService.deleteUser(id, token);
 
-export const adminSlice=createSlice({
-    name:'users',
-    initialState,
-    reducers:{
-        reset:(state)=>initialState,
-    },
-    extraReducers:(builder)=>{
-        builder
-        .addCase(getUser.pending,(state)=>{
-            state.isLoading=true
-        })
-        .addCase(getUser.fulfilled,(state,action)=>{
-            state.isLoading=false
-            state.isSuccess=true
-            state.users=action.payload
+      //  getUser();
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
 
-        }) 
-        .addCase(getUser.rejected,(state,action)=>{
-            state.isLoading=false 
-            state.isError=true
-            state.message=action.payload
-        })
-        .addCase(deleteUser.pending,(state)=>{
-            state.isLoading=true
-        })
-        .addCase(deleteUser.fulfilled,(state,action)=>{
-            state.isLoading=false
-            state.isSuccess=true
-            state.users=state.users.filter((user)=>user._id !==action.payload.id)
-        })
-        .addCase(deleteUser.rejected,(state,action)=>{
-            state.isLoading = false
-            state.isError = true
-            state.message = action.payload
-        })
-        
-    },
-})
+export const adminSlice = createSlice({
+  name: "users",
+  initialState,
+  reducers: {
+    reset: (state) => initialState,
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getUser.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.users = action.payload;
+      })
+      .addCase(getUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(deleteUser.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(deleteUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.users = state.users.filter(
+          (user) => user._id !== action.payload.id
+        );
+      })
+      .addCase(deleteUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      });
+  },
+});
 
-export const {reset}=adminSlice.actions
-export default adminSlice.reducer
+export const { reset } = adminSlice.actions;
+export default adminSlice.reducer;

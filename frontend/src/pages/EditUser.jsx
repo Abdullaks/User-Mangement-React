@@ -1,110 +1,82 @@
-import React,{ useState, useEffect } from 'react'
-import {useDispatch } from 'react-redux'
-import axios from 'axios'
-import { useNavigate,useParams } from 'react-router-dom'
-import { getOneUser} from '../features/admin/adminSlice'
-// import { toast } from 'react-toastify'
-// import { FaUser } from 'react-icons/fa'
-// import { register, reset } from '../features/auth/authSlice'
-// import Spinner from '../components/Spinner'
+import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
+import { getOneUser } from "../features/admin/adminSlice";
 
 function EditUser() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+  });
 
-    // const { users, isLoading, isError, message } = useSelector(
-    //     (state) => state.users
-    //   );
+  const { id } = useParams();
 
-    // const [state,setState]=useState([])
-      
-    const navigate=useNavigate()
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-      })
+  useEffect(() => {
+    axios({
+      method: "get",
+      url: `/api/users/getOneUser/${id}`,
+    }).then((res) => setFormData(res.data));
+  }, []);
 
-      // const dispatch = useDispatch();
-      const { id }=useParams();
-      // useEffect(() => {
-      //   dispatch(getOneUser(id));
-      // }, []);
-                                                     
-      useEffect(()=>{
-        axios({
-          method:'get',
-          url:`/api/users/getOneUser/${id}`
-        })
-        .then((res)=>setFormData(res.data))
-      },[])
+  const { name, email } = formData;
 
-      const { name, email } = formData
+  const onChange = (e) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
-    const onChange=(e)=>{
-        setFormData((prevState)=>({
-            ...prevState,
-            [e.target.name]:e.target.value
-        }))
+  const onSubmit = async (e) => {
+    e.preventDefault();
 
-    }
+    const data = await axios.post(`/api/users/editUser/${id}`, { name, email });
 
-    const onSubmit=async(e)=>{
-        e.preventDefault()
-
-        const  data  = await axios.post(`/api/users/editUser/${id}`, {name,email})
-
-        navigate('/admin')
-
-
-        // axios({
-        //   method:'post',
-        //   url:(`/api/users/editUser/${id}`,{formData})
-        // })
-        // const userData={
-        //    email,password
-        // }
-        // dispatch(login(userData))
-       }
+    navigate("/admin");
+  };
 
   return (
     <>
       <section className="heading">
-    <h1>Edit User</h1>
-    {/* <p>Please login</p> */}
-    </section>
+        <h1>Edit User</h1>
+      </section>
 
-    <section className='form'>
+      <section className="form">
         <form onSubmit={onSubmit}>
-          <div className='form-group'>
+          <div className="form-group">
             <input
-              type='text'
-              className='form-control'
-              id='name'
-              name='name'
+              type="text"
+              className="form-control"
+              id="name"
+              name="name"
               value={name}
-              placeholder='Enter your name'
+              placeholder="Enter your name"
               onChange={onChange}
             />
           </div>
-          <div className='form-group'>
+          <div className="form-group">
             <input
-              type='email'
-              className='form-control'
-              id='email'
-              name='email'
+              type="email"
+              className="form-control"
+              id="email"
+              name="email"
               value={email}
-              placeholder='Enter your email'
+              placeholder="Enter your email"
               onChange={onChange}
             />
           </div>
-          
-          <div className='form-group'>
-            <button type='submit' className='btn btn-block'>
+
+          <div className="form-group">
+            <button type="submit" className="btn btn-block">
               Submit
             </button>
           </div>
         </form>
       </section>
     </>
-  )
+  );
 }
 
-export default EditUser
+export default EditUser;
